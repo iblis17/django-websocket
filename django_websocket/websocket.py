@@ -2,6 +2,7 @@ import collections
 import select
 import string
 import struct
+import re
 try:
     from hashlib import md5
 except ImportError: #pragma NO COVER
@@ -33,8 +34,11 @@ def _extract_number(value):
 
 
 def setup_websocket(request):
-    if request.META.get('HTTP_CONNECTION', None) == 'Upgrade' and \
-        request.META.get('HTTP_UPGRADE', None) == 'WebSocket':
+    http_connection = request.META.get('HTTP_CONNECTION', '')
+    http_upgrade = request.META.get('HTTP_UPGRADE', '')
+
+    if re.match('Upgrade', http_connection, re.I) and \
+        re.match('WebSocket', http_upgrade, re.I):
 
         # See if they sent the new-format headers
         if 'HTTP_SEC_WEBSOCKET_KEY1' in request.META:
